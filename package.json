@@ -1,0 +1,16 @@
+{
+  "name": "orbit-01",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A 3D space survival game built with JavaScript, Three.js and Web Audio.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test"
+  }
+}

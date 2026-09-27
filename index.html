@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#06121b" />
+    <meta
+      name="description"
+      content="Pilot ORBIT 01 through a meteor field in third person. Use W, A, S and D to dodge hazards and survive in space."
+    />
+    <title>ORBIT 01 · Meteor Field</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <main id="game" aria-label="ORBIT 01, a meteor-dodging game">
+      <canvas id="space" aria-label="Third-person rocket view"></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <header class="hud">
+        <div class="brand">
+          <span class="brand-symbol" aria-hidden="true">✦</span>
+          <div>ORBIT<span class="designation">01 / EXPLORER</span></div>
+        </div>
+        <div class="telemetry">
+          <div>
+            <span class="metric-label">FLIGHT TIME</span
+            ><strong id="timer">00:00</strong>
+          </div>
+          <div class="distance">
+            <span class="metric-label">DISTANCE</span
+            ><strong><span id="distance">0</span><small>m</small></strong>
+          </div>
+          <div class="speed">
+            <span class="metric-label">SPEED</span
+            ><strong><span id="speed">173</span><small>km/h</small></strong>
+          </div>
+          <button
+            id="pause"
+            class="icon-button"
+            aria-label="Pause game"
+            title="Pause (Esc)"
+            hidden
+          >
+            Ⅱ
+          </button>
+        </div>
+        <div class="pilot-level">
+          LV. <strong id="hud-level">1</strong
+          ><span id="run-xp">EXPEDITION</span>
+        </div>
+      </header>
+      <div class="flight-panel" id="flight-panel" hidden>
+        <div class="flight-wallet">
+          <span>FLIGHT COINS</span><strong id="run-coins">0</strong>
+        </div>
+        <div class="combo-meter" id="combo-meter" hidden>
+          <strong id="combo-count">COMBO ×1</strong
+          ><span>Another near miss within 8 s</span>
+          <div><i id="combo-fill"></i></div>
+        </div>
+        <div class="encounter-panel" id="encounter-panel" hidden>
+          <span>SPECIAL ENCOUNTER</span><strong id="encounter-name"></strong>
+          <p id="encounter-hint"></p>
+        </div>
+      </div>
+      <div
+        id="hazard-warning"
+        class="hazard-warning"
+        aria-live="polite"
+        hidden
+      ></div>
+      <div id="reward-toast" class="reward-toast" role="status" hidden></div>
+      <section class="overlay" id="overlay" aria-labelledby="screen-title">
+        <div class="screen-card">
+          <p class="eyebrow" id="eyebrow">METEOR FIELD</p>
+          <h1 id="screen-title">Space<br />won’t wait.</h1>
+          <p class="description" id="description">
+            Pilot the rocket. Dodge the meteors.<br />Survive as long as you
+            can.
+          </p>
+          <div id="result" class="result" hidden></div>
+          <div id="flight-report" class="flight-report" hidden></div>
+          <section class="flight-brief">
+            <h2 id="contracts-title">Flight objectives</h2>
+            <div id="contract-list"></div>
+            <p>Earn bonus XP after 15 s of flight.</p>
+          </section>
+          <button class="primary" id="start" disabled>
+            Preparing rocket… <span aria-hidden="true">↗</span>
+          </button>
+          <p id="hint" class="hint">
+            W A S D to move · Esc to pause · M for music
+          </p>
+          <p id="unlock-notice" class="unlock-notice" role="status" hidden></p>
+        </div>
+        <aside class="hangar" id="hangar" aria-labelledby="hangar-title">
+          <div class="hangar-heading">
+            <h2 id="hangar-title">Your hangar</h2>
+            <span id="flight-count">0 flights</span
+            ><button id="open-shop" class="wallet-button" title="Open shop">
+              ◈ <span id="wallet-coins">0</span>
+            </button>
+          </div>
+          <div
+            class="hangar-tabs"
+            role="tablist"
+            aria-label="Hangar and expedition"
+          >
+            <button
+              id="tab-skin"
+              role="tab"
+              aria-selected="true"
+              aria-controls="panel-skin"
+              tabindex="0"
+            >
+              Skins <span id="skin-count"></span></button
+            ><button
+              id="tab-ability"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-ability"
+              tabindex="-1"
+            >
+              Abilities <span id="ability-count"></span></button
+            ><button
+              id="tab-trail"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-trail"
+              tabindex="-1"
+            >
+              Trails <span id="trail-count"></span></button
+            ><button
+              id="tab-environment"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-environment"
+              tabindex="-1"
+            >
+              Environments <span id="environment-count"></span></button
+            ><button
+              id="tab-meteor"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-meteor"
+              tabindex="-1"
+            >
+              Meteors <span id="meteor-count"></span></button
+            ><button
+              id="tab-shop"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-shop"
+              tabindex="-1"
+            >
+              Shop <span id="shop-count"></span></button
+            ><button
+              id="tab-levels"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-levels"
+              tabindex="-1"
+            >
+              Expedition <span id="levels-count"></span>
+            </button>
+          </div>
+          <div id="panel-skin" role="tabpanel" aria-labelledby="tab-skin">
+            <p class="collection-intro">
+              Distinctive finishes that give each rocket its own identity.
+            </p>
+            <div id="skin-list" class="skin-list" aria-label="Skins"></div>
+          </div>
+          <div
+            id="panel-ability"
+            role="tabpanel"
+            aria-labelledby="tab-ability"
+            hidden
+          >
+            <p class="collection-intro">
+              Advanced challenges. One ability per flight, with any skin.
+            </p>
+            <div
+              id="ability-list"
+              class="skin-list"
+              aria-label="Abilities"
+            ></div>
+          </div>
+          <div
+            id="panel-trail"
+            role="tabpanel"
+            aria-labelledby="tab-trail"
+            hidden
+          >
+            <p class="collection-intro">
+              Plasma, ribbons and halos of light. Purely cosmetic customization.
+            </p>
+            <div id="trail-list" class="skin-list" aria-label="Trails"></div>
+          </div>
+          <div
+            id="panel-environment"
+            role="tabpanel"
+            aria-labelledby="tab-environment"
+            hidden
+          >
+            <p class="collection-intro">
+              Choose your corner of the cosmos. The rarest sights await at the
+              end of the expedition.
+            </p>
+            <div
+              id="environment-list"
+              class="skin-list"
+              aria-label="Environments"
+            ></div>
+          </div>
+          <div
+            id="panel-meteor"
+            role="tabpanel"
+            aria-labelledby="tab-meteor"
+            hidden
+          >
+            <p class="collection-intro">
+              From lunar rocks to impossible relics. Every appearance uses the
+              same collision rules.
+            </p>
+            <div id="meteor-list" class="skin-list" aria-label="Meteors"></div>
+          </div>
+          <div
+            id="panel-shop"
+            role="tabpanel"
+            aria-labelledby="tab-shop"
+            hidden
+          >
+            <p class="collection-intro">
+              Collect gold coins in flight; purple coins are worth five. They
+              are saved when your flight ends. Find exclusive rocket cosmetics
+              here.
+            </p>
+            <div id="shop-list" class="skin-list"></div>
+            <p id="shop-message" role="status" class="shop-message"></p>
+          </div>
+          <div
+            id="panel-levels"
+            role="tabpanel"
+            aria-labelledby="tab-levels"
+            hidden
+          >
+            <div class="expedition-heading">
+              <div>
+                <p class="eyebrow">EXPEDITION PATH</p>
+                <h3>
+                  Level <span id="level-number">1</span><small>/ 50</small>
+                </h3>
+              </div>
+              <p>
+                50 levels. 50 exclusive rewards.<br />From your first finish to
+                the cosmos of Genesis.
+              </p>
+            </div>
+            <div class="xp-bar" aria-hidden="true">
+              <span id="xp-fill"></span>
+            </div>
+            <div class="xp-labels">
+              <span id="xp-summary"></span><strong id="next-reward"></strong>
+            </div>
+            <nav
+              class="level-chapters"
+              id="level-chapters"
+              aria-label="Expedition chapters"
+            >
+              <button data-chapter="1">01—10 · Liftoff</button
+              ><button data-chapter="11">11—20 · Exploration</button
+              ><button data-chapter="21">21—30 · Frontier</button
+              ><button data-chapter="31">31—40 · Legend</button
+              ><button data-chapter="41">41—50 · Ascension</button>
+            </nav>
+            <ol
+              class="level-track"
+              id="level-track"
+              aria-label="Rewards from level 1 to 50"
+            ></ol>
+            <p class="expedition-help">
+              Earn XP by completing flights of at least 15 seconds: flight time,
+              meteors dodged, combos and flight objectives all count. Bonus XP
+              is capped at 50% of base XP. Rewards unlock automatically. The
+              expedition starts at level 1 and preserves your existing
+              collections.
+            </p>
+          </div>
+          <div class="loadout-summary">
+            <span>SKINS<strong id="selected-skin"></strong></span
+            ><span>ABILITIES<strong id="selected-ability"></strong></span
+            ><span>TRAILS<strong id="selected-trail"></strong></span
+            ><span>ENVIRONMENTS<strong id="selected-environment"></strong></span
+            ><span>METEORS<strong id="selected-meteor"></strong></span>
+          </div>
+          <div class="record-line">
+            <span>Best flight <strong id="best-flight">00:00</strong></span
+            ><span>Dodged <strong id="total-avoided">0</strong></span>
+          </div>
+          <p class="ability-help">
+            Complete every challenge for a reward or reach its expedition level.
+            Change your loadout between flights; press Space to activate your
+            ability.
+          </p>
+          <details class="flight-ledger">
+            <summary>
+              Recent flights · best combo <span id="best-combo">0</span>
+            </summary>
+            <ol id="recent-flights"></ol>
+          </details>
+          <div class="music-controls">
+            <button
+              id="music-toggle"
+              aria-pressed="false"
+              title="Toggle music (M)"
+            >
+              Music</button
+            ><label for="music-volume">Volume</label
+            ><input
+              id="music-volume"
+              type="range"
+              min="0"
+              max="70"
+              value="25"
+              aria-label="Music volume"
+            /><small id="music-status">Orbital Drift · ambient</small>
+          </div>
+          <p class="storage-note" id="storage-note">
+            Progress is saved in this browser.
+          </p>
+        </aside>
+        <div class="preview-status" id="preview-status" hidden>
+          <strong id="preview-name"></strong>
+          <p id="preview-description"></p>
+          <button id="close-preview">Back to my loadout</button>
+        </div>
+      </section>
+      <footer class="flight-footer">
+        <div class="key-guide" aria-label="Controls">
+          <div class="key-grid" aria-hidden="true">
+            <kbd class="w">W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+          </div>
+          <div>
+            <strong>FREE MOVEMENT</strong><span>Up, down and side to side</span>
+          </div>
+        </div>
+        <span class="flight-status" id="flight-status">READY FOR LIFTOFF</span
+        ><span class="view-label">CAMERA / THIRD PERSON</span>
+      </footer>
+      <button id="ability-control" class="ability-control" hidden>
+        <kbd id="ability-key">SPACE</kbd><span id="ability-label"></span>
+      </button>
+      <div class="touch-controls" aria-label="Touch controls">
+        <button data-move="up" aria-label="Move up">↑</button
+        ><button data-move="left" aria-label="Move left">←</button
+        ><button data-move="down" aria-label="Move down">↓</button
+        ><button data-move="right" aria-label="Move right">→</button>
+      </div>
+      <p id="announcement" class="sr-only" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./src/game.mjs"></script>
+  </body>
+</html>
