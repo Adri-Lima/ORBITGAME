@@ -1,5 +1,9 @@
 # ORBIT 01
 
+**[▶ Play ORBIT](https://adri-lima.github.io/ORBITGAME/)**
+
+Play directly in your browser. No installation needed.
+
 A third-person space survival game. Pilot a rocket through a meteor field, collect coins, complete flight objectives, and unlock new equipment across a 50-level expedition.
 
 Built with **JavaScript ES modules, Three.js, HTML, CSS, and the Web Audio API**. The game runs entirely in the browser, with local assets and no build step.
@@ -82,8 +86,7 @@ Rendering, sound output, and physical touch interaction require browser/device c
 
 Source: [Adri-Lima/ORBITGAME](https://github.com/Adri-Lima/ORBITGAME).
 
-
-The source is published in this repository, with `index.html` at the root. Follow the [GitHub Pages guide](docs/GITHUB.md) to publish a playable demo and add it to the repository's About section.
+The [live demo](https://adri-lima.github.io/ORBITGAME/) is hosted on GitHub Pages. The source is published in this repository, with `index.html` at the root. See the [GitHub Pages guide](docs/GITHUB.md) for hosting details.
 
 All runtime paths are relative, so the same files can run under a GitHub Pages project path. No account credentials, API keys, or hosting-specific configuration are needed.
 
